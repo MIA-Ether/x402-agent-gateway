@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
+    "@x402/protocol": "workspace:*",
     "hono": "^4.7.2"
   },
   "devDependencies": {
