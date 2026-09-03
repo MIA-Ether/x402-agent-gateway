@@ -38,13 +38,47 @@ export interface SettlementResponse {
   errorReason?: string;
 }
 
+function bytesToBinaryString(bytes: Uint8Array): string {
+  let result = "";
+
+  const chunkSize = 0x8000;
+
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    result += String.fromCharCode(
+      ...bytes.subarray(i, i + chunkSize)
+    );
+  }
+
+  return result;
+}
+
+function binaryStringToBytes(value: string): Uint8Array {
+  const bytes = new Uint8Array(value.length);
+
+  for (let i = 0; i < value.length; i++) {
+    bytes[i] = value.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
 export function encodeHeaderValue(value: unknown): string {
   const json = JSON.stringify(value);
-  return Buffer.from(json, "utf8").toString("base64");
+
+  const bytes = new TextEncoder().encode(json);
+
+  return globalThis.btoa(
+    bytesToBinaryString(bytes)
+  );
 }
 
 export function decodeHeaderValue<T>(value: string): T {
-  const json = Buffer.from(value, "base64").toString("utf8");
+  const binary = globalThis.atob(value);
+
+  const bytes = binaryStringToBytes(binary);
+
+  const json = new TextDecoder().decode(bytes);
+
   return JSON.parse(json) as T;
 }
 
@@ -60,11 +94,13 @@ export function createPaymentRequired(input: {
 }): PaymentRequired {
   return {
     x402Version: 2,
+
     resource: {
       url: input.resourceUrl,
       description: input.description,
       mimeType: input.mimeType ?? "application/json"
     },
+
     accepts: [
       {
         scheme: "exact",
@@ -72,13 +108,16 @@ export function createPaymentRequired(input: {
         amount: input.amount,
         asset: input.asset,
         payTo: input.payTo,
-        maxTimeoutSeconds: input.maxTimeoutSeconds ?? 60,
+        maxTimeoutSeconds:
+          input.maxTimeoutSeconds ?? 60,
+
         extra: {
           name: "USDC",
           version: "2"
         }
       }
     ],
+
     extensions: {}
   };
 }
