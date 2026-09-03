@@ -62,7 +62,40 @@ importers:
 
   packages/core: {}
 
+  packages/facilitator:
+    dependencies:
+      '@x402/core':
+        specifier: workspace:*
+        version: link:../core
+      '@x402/protocol':
+        specifier: workspace:*
+        version: link:../x402
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/graph:
+    dependencies:
+      '@x402/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/policy-engine:
+    dependencies:
+      '@x402/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/wallet:
     dependencies:
       '@x402/core':
         specifier: workspace:*
